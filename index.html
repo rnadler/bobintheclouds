@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+  </head>
+  <body>
+    <H3>Welcome to Bob's Guest Book</H3> 
+    This was created as part of my <a href="http://rdn-consulting.com/blog/2009/02/07/exploring-cloud-computing-development">Exploring Cloud Computing Development</a> post.<br><br>
+    <a href="{{ url }}">{{ url_linktext }}</a><br><br>
+   <strong>Enter a comment:</strong><br>
+    <form action="/sign" method="post">
+      <div><textarea name="content" rows="3" cols="60"></textarea></div>
+      <div><input type="submit" value="Sign Guestbook"></div>
+    </form>
+    <strong>Comments:</strong><br><br>
+    {% for greeting in greetings %}
+      On {{ greeting.DateTimeStr  }} 
+      {% if greeting.author %}
+        <b>{{ greeting.author.nickname }}</b> wrote:
+      {% else %}
+       an anonymous person wrote:
+      {% endif %}
+      <blockquote>{{ greeting.content|escape }}</blockquote>
+    {% endfor %}
+
+
+
+  </body>
+</html>
