@@ -1,26 +1,13 @@
 import os
+import webapp2
 from google.appengine.ext.webapp import template
-
-import cgi
-
 from google.appengine.api import users
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext import db
-from datetime import timedelta
+from greeting import Greeting
 
-class Greeting(db.Model):
-  author = db.UserProperty()
-  content = db.StringProperty(multiline=True)
-  date = db.DateTimeProperty(auto_now_add=True)
-  def DateTimeStr(self):
-    pst = self.date + timedelta(hours=-8)
-    return pst.strftime("%d-%b-%Y %I:%M:%S%p PST")
 
-class MainPage(webapp.RequestHandler):
+class MainPage(webapp2.RequestHandler):
   def get(self):
-    greetings_query = Greeting.all().order('-date')
-    greetings = greetings_query.fetch(500)
+    greetings = Greeting().uniqueList()
 
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
@@ -38,7 +25,7 @@ class MainPage(webapp.RequestHandler):
     path = os.path.join(os.path.dirname(__file__), 'index.html')
     self.response.out.write(template.render(path, template_values))
 
-class Guestbook(webapp.RequestHandler):
+class Guestbook(webapp2.RequestHandler):
   def post(self):
     greeting = Greeting()
     cont = self.request.get('content')
@@ -55,13 +42,7 @@ class Guestbook(webapp.RequestHandler):
     else:
       self.response.out.write("<h4>Please enter a comment.</h4>Use the Back button to return to the Guest Book.")
 
-application = webapp.WSGIApplication(
+application = webapp2.WSGIApplication(
                                      [('/', MainPage),
                                       ('/sign', Guestbook)],
                                      debug=True)
-
-def main():
-  run_wsgi_app(application)
-
-if __name__ == "__main__":
-  main()
